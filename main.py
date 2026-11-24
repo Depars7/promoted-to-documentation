@@ -24,6 +24,11 @@ def check_line(line):
         assert bad not in line, "the entry must stay on one line"
 
 
+def verify_on_disk(payload):
+    """Prove the bytes on disk are the bytes that were validated."""
+    assert DESTINATION.read_bytes() == payload, "entry changed while writing"
+
+
 def produce():
     check_line(ENTRY_TEXT)
     payload = ENTRY_TEXT.encode("utf-8")
@@ -32,8 +37,7 @@ def produce():
     # The collecting process runs under a different account, so the
     # file itself (never its folder) is made readable for everyone.
     DESTINATION.chmod(0o644)
-    # Prove the bytes on disk are the bytes that were validated.
-    assert DESTINATION.read_bytes() == payload, "entry changed while writing"
+    verify_on_disk(payload)
 
 
 if __name__ == "__main__":
